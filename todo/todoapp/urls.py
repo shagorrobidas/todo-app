@@ -1,11 +1,12 @@
 from django.urls import path
-from  . import views
+from . import views
 
 
 urlpatterns = [
-    path('', views.home, name="home-page"),
-    path('register/', views.register, name="register"),
-    path('login/', views.loginpage, name="loginpage"),
-    path('delete-tesk/<str:name>/', views.DeleteTask, name="delete"),
-    path('update-tesk/<str:name>/', views.UpdateTaks, name="update"),
+    path('', views.HomepageView, name="home-page"),
+    path('register/', views.RegisterView, name="register"),
+    path('login/', views.LoginpageView, name="loginpage"),
+    path('logout/', views.LogoutpageView, name="logoutpage"),
+    path('delete-tesk/<int:pk>/', views.DeleteTaskView, name="delete"),
+    path('update-tesk/<int:pk>/', views.UpdateTaksView, name="update"),
 ]

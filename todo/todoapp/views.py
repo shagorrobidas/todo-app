@@ -4,16 +4,28 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .models import Todo
 
+from django.contrib.auth.decorators import login_required
+
 # Create your views here.
 
-def home(request):
+
+@login_required
+def HomepageView(request):
+    # if request.user.is_authenticeted:
+    #     return redirect('home-page')
+
     if request.method == 'POST':
         task = request.POST.get('task')
-        if task:  # Ensure task is not empty
-            newTodo = Todo(user=request.user, name=task)
-            newTodo.save()
+        description = request.POST.get('description')
 
-    # Fetch all todos for both GET and POST requests
+        if task and description:
+            newTodo = Todo(
+                user=request.user,
+                name=task,
+                description=description
+                )
+            newTodo.save()
+        
     all_todos = Todo.objects.filter(user=request.user)
     context = {
         'todos': all_todos
@@ -22,7 +34,7 @@ def home(request):
     return render(request, 'todoapp/todo.html', context)
 
 
-def register(request):
+def RegisterView(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         email = request.POST.get('email')
@@ -31,12 +43,12 @@ def register(request):
         if len(password) < 4:
             messages.error(request, 'Password must be at least 4 characters')
             return redirect('register')
-        
+
         get_all_users_by_username = User.objects.filter(username=username)
         if get_all_users_by_username:
             messages.error(request, 'Error, username already exists, User another.')  # noqa
             return redirect('register')
-        
+
         get_all_users_by_email = User.objects.filter(email=email)
         if get_all_users_by_email:
             messages.error(request, 'Error, Email already exists, User another.')  # noqa
@@ -51,7 +63,10 @@ def register(request):
     return render(request, 'todoapp/register.html', {})
 
 
-def loginpage(request):
+def LoginpageView(request):
+    # if request.user.is_authenticeted:
+    #     return redirect('home-page')
+
     if request.method == 'POST':
         username = request.POST.get('uname')
         password = request.POST.get('pass')
@@ -63,15 +78,24 @@ def loginpage(request):
         else:
             messages.error(request, 'Error, wrong user details or user does not exist.')  # noqa
             return redirect('loginpage')
-
     return render(request, 'todoapp/login.html', {})
 
 
-def DeleteTask(request, name):
-    get_todo = Todo.objects.get(user=request.user, name=name)
+def LogoutpageView(request):
+    logout(request)
+    return redirect('loginpage')
+
+
+@login_required
+def DeleteTaskView(request, pk):
+    get_todo = Todo.objects.get(user=request.user, pk=pk)
     get_todo.delete()
     return redirect('home-page')
 
 
-def UpdateTaks(request, name):
-    pass
+@login_required
+def UpdateTaksView(request, pk):
+    get_todo = Todo.objects.get(user=request.user, pk=pk)
+    get_todo.status = True
+    get_todo.save()
+    return redirect('home-page')
