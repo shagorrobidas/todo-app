@@ -2,11 +2,19 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout 
 from django.contrib import messages
+from .models import Todo
 
 # Create your views here.
 
 
 def home(request):
+    if request.method == 'POST':
+        task = request.POST.get('task')
+
+        newTodo = Todo(user=request.user, name=task)
+        print(newTodo)
+        newTodo.save()
+
     return render(request, 'todoapp/todo.html', {})
 
 
@@ -33,7 +41,7 @@ def register(request):
         newUser = User.objects.create_user(
             username=username, email=email, password=password)
         newUser.save()
-        
+
         messages.error(request, 'User successfully created,login now.')
         return redirect('loginpage')
     return render(request, 'todoapp/register.html', {})

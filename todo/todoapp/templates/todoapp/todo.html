@@ -31,18 +31,14 @@
               <table class="table mb-4">
                 <thead>
                   <tr>
-                    <th scope="col">Todo item</th>
+                    <th scope="col">Sl No </th>
+                    <th scope="col">Todo item name</th>
+                    <th scope="col">Todo item description</th>
                     <th scope="col">Status</th>
                     <th scope="col">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-
-                  <tr>
-                    <td>1</td>
-                    <td>a</td>
-                    <td>Completed</td>
-                  </tr>
                   {% for i in todos %}
                   <tr>
                     <td>{{i.todo_name}}</td>
