@@ -32,8 +32,13 @@ class HomepageView(LoginRequiredMixin, View):
         return redirect('home-page')
 
 
-def RegisterView(request):
-    if request.method == 'POST':
+class RegisterView(View):
+    template_name = 'todoapp/register.html'
+
+    def get(self, request):
+        return render(request, self.template_name)
+    
+    def post(self, request):
         username = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -42,24 +47,19 @@ def RegisterView(request):
             messages.error(request, 'Password must be at least 4 characters')
             return redirect('register')
 
-        get_all_users_by_username = User.objects.filter(username=username)
-        if get_all_users_by_username:
-            messages.error(request, 'Error, username already exists, User another.')  # noqa
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Error, username already exists. Use another.')
             return redirect('register')
 
-        get_all_users_by_email = User.objects.filter(email=email)
-        if get_all_users_by_email:
-            messages.error(request, 'Error, Email already exists, User another.')  # noqa
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'Error, Email already exists. Use another.')
             return redirect('register')
 
-        newUser = User.objects.create_user(
-            username=username, email=email, password=password)
-        newUser.save()
-
-        messages.error(request, 'User successfully created,login now.')
+        User.objects.create_user(
+            username=username, email=email, password=password
+        )
+        messages.success(request, 'User successfully created. Login now.')
         return redirect('loginpage')
-    return render(request, 'todoapp/register.html', {})
-
 
 def LoginpageView(request):
     # if request.user.is_authenticeted:
