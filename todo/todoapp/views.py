@@ -5,33 +5,31 @@ from django.contrib import messages
 from .models import Todo
 
 from django.contrib.auth.decorators import login_required
+from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
 
 
-@login_required
-def HomepageView(request):
-    # if request.user.is_authenticeted:
-    #     return redirect('home-page')
+class HomepageView(LoginRequiredMixin, View):
+    def get(self, request):
+        all_todos = Todo.objects.filter(user=request.user)
+        context = {
+            'todos': all_todos
+        }
+        return render(request, 'todoapp/todo.html', context)
 
-    if request.method == 'POST':
+    def post(self, request):
         task = request.POST.get('task')
         description = request.POST.get('description')
 
         if task and description:
-            newTodo = Todo(
+            Todo.objects.create(
                 user=request.user,
                 name=task,
                 description=description
-                )
-            newTodo.save()
-        
-    all_todos = Todo.objects.filter(user=request.user)
-    context = {
-        'todos': all_todos
-    }
-
-    return render(request, 'todoapp/todo.html', context)
+            )
+        return redirect('home-page')
 
 
 def RegisterView(request):
