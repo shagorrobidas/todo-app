@@ -7,6 +7,7 @@ from .models import Todo
 from django.contrib.auth.decorators import login_required
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect, get_object_or_404
 
 # Create your views here.
 
@@ -32,7 +33,7 @@ class HomepageView(LoginRequiredMixin, View):
         return redirect('home-page')
 
 
-class RegisterView(View):
+class RegisterView(View, LoginRequiredMixin):
     template_name = 'todoapp/register.html'
 
     def get(self, request):
@@ -61,34 +62,39 @@ class RegisterView(View):
         messages.success(request, 'User successfully created. Login now.')
         return redirect('loginpage')
 
-def LoginpageView(request):
-    # if request.user.is_authenticeted:
-    #     return redirect('home-page')
+class LoginpageView(View, LoginRequiredMixin):
+    template_name = 'todoapp/login.html'
 
-    if request.method == 'POST':
+    def get(self, request):
+        return render(request, self.template_name)
+
+    def post(self, request):
         username = request.POST.get('uname')
         password = request.POST.get('pass')
 
-        validate_user = authenticate(username=username, password=password)
-        if validate_user is not None:
-            login(request, validate_user)
+        user = authenticate(
+            username=username,
+            password=password
+        )
+        if user is not None:
+            login(request, user)
             return redirect('home-page')
         else:
-            messages.error(request, 'Error, wrong user details or user does not exist.')  # noqa
+            messages.error(request, 'Error, wrong user details or user does not exist.')
             return redirect('loginpage')
-    return render(request, 'todoapp/login.html', {})
 
 
-def LogoutpageView(request):
-    logout(request)
-    return redirect('loginpage')
+class LogoutpageView(View, LoginRequiredMixin):
+    def get(self, request):
+        logout(request)
+        return redirect('loginpage')
 
 
-@login_required
-def DeleteTaskView(request, pk):
-    get_todo = Todo.objects.get(user=request.user, pk=pk)
-    get_todo.delete()
-    return redirect('home-page')
+class DeleteTaskView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        todo = get_object_or_404(Todo, pk=pk, user=request.user)
+        todo.delete()
+        return redirect('home-page')
 
 
 @login_required

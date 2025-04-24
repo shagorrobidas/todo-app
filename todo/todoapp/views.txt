@@ -25,3 +25,33 @@ def RegisterView(request):
         messages.error(request, 'User successfully created,login now.')
         return redirect('loginpage')
     return render(request, 'todoapp/register.html', {})
+
+
+
+def LoginpageView(request):
+    # if request.user.is_authenticeted:
+    #     return redirect('home-page')
+
+    if request.method == 'POST':
+        username = request.POST.get('uname')
+        password = request.POST.get('pass')
+
+        validate_user = authenticate(username=username, password=password)
+        if validate_user is not None:
+            login(request, validate_user)
+            return redirect('home-page')
+        else:
+            messages.error(request, 'Error, wrong user details or user does not exist.')  # noqa
+            return redirect('loginpage')
+    return render(request, 'todoapp/login.html', {})
+
+
+def LogoutpageView(request):
+    logout(request)
+    return redirect('loginpage')
+
+@login_required
+def DeleteTaskView(request, pk):
+    get_todo = Todo.objects.get(user=request.user, pk=pk)
+    get_todo.delete()
+    return redirect('home-page')
