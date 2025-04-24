@@ -97,9 +97,9 @@ class DeleteTaskView(LoginRequiredMixin, View):
         return redirect('home-page')
 
 
-@login_required
-def UpdateTaksView(request, pk):
-    get_todo = Todo.objects.get(user=request.user, pk=pk)
-    get_todo.status = True
-    get_todo.save()
-    return redirect('home-page')
+class UpdateTaskView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        todo = get_object_or_404(Todo, pk=pk, user=request.user)
+        todo.status = True
+        todo.save()
+        return redirect('home-page')

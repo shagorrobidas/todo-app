@@ -55,3 +55,12 @@ def DeleteTaskView(request, pk):
     get_todo = Todo.objects.get(user=request.user, pk=pk)
     get_todo.delete()
     return redirect('home-page')
+
+
+@login_required
+def UpdateTaksView(request, pk):
+    get_todo = Todo.objects.get(user=request.user, pk=pk)
+    get_todo.status = True
+    get_todo.save()
+    return redirect('home-page')
+

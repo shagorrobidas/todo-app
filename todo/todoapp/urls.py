@@ -28,5 +28,9 @@ urlpatterns = [
         views.DeleteTaskView.as_view(),
         name="delete"
     ),
-    path('update-tesk/<int:pk>/', views.UpdateTaksView, name="update"),
+    path(
+        'update-tesk/<int:pk>/',
+        views.UpdateTaskView.as_view(),
+        name="update"
+    ),
 ]
